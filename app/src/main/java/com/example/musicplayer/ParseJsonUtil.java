@@ -6,8 +6,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ParseJsonUtil {
     Album album;
+    List<String> top;
 
     public String parseJsonObj(String response) throws JSONException {
         album = new Album();
@@ -19,11 +24,14 @@ public class ParseJsonUtil {
         return albumImg;
     }
 
-    public void parseJsonArr(String response, String key) throws JSONException {
-        JSONArray jsonArray = new JSONObject(response).getJSONArray(key);
-        for (int i = 0; i <jsonArray.length(); i++){
+    public List<String> parseJsonArr(String response) throws JSONException {
+        top = new ArrayList<>();
+        JSONArray jsonArray = new JSONObject(response).getJSONArray("song_list");
+        for (int i = 0; i <3; i++){
             JSONObject jsonObj = jsonArray.getJSONObject(i);
-            String pic = jsonObj.getString("pic_s192");
+            String name = jsonObj.getString("title");
+            top.add(name);
         }
+        return top;
     }
 }

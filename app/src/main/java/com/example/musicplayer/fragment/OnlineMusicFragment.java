@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,6 +31,7 @@ import java.util.List;
 public class OnlineMusicFragment extends Fragment {
     private RecyclerView onlineMusicList;
     private List<Album> albums = new ArrayList<>();
+    private List<URL> urls = new ArrayList<>();
 
     @Nullable
     @Override
@@ -38,6 +40,7 @@ public class OnlineMusicFragment extends Fragment {
         onlineMusicList = view.findViewById(R.id.onlineMusic_list);
         getData();
         initRv();
+        onlineMusicList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         return view;
     }
 
@@ -47,43 +50,48 @@ public class OnlineMusicFragment extends Fragment {
             @Override
             public void run() {
                 Message msg = new Message();
-                HttpURLConnection connection = null;
-                try {
-                    URL url = new URL("http://tingapi.ting.baidu.com/v1/restserver/ting?from=qianqian&version=2.1.0&method=baidu.ting.billboard.billList&format=json&type=1&offset=0&size=50");
-                    connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                    Log.i("HttpURLConnection.GET","开始连接");
-                    connection.connect();
-                    if (connection.getResponseCode() == 200) {
-                        Log.i("HttpURLConnection.GET", "请求成功");
-                        InputStream in = connection.getInputStream();
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                        StringBuilder response = new StringBuilder();
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            response.append(line);
-                        }
-                        ParseJsonUtil parseJsonUtil = new ParseJsonUtil();
-                        String albumImgPath = parseJsonUtil.parseJsonObj(response.toString());
-                        Album album = new Album();
-                        album.setAlbumImgPath(albumImgPath);
-                        album.setTop1("top1");
-                        album.setTop2("top2");
-                        album.setTop3("top3");
-                        System.out.println(album);
-                        albums.add(album);
-                        msg.what = 1;
-                        handler.sendMessage(msg);
-                    }else {
-                        Log.i("HttpURLConnection.GET", "请求失败");
+                for(int i=1;i<12;i++) {
+                    if (i == 3) {
+                        i = 11;
                     }
-                } catch (Exception e){
-                    e.printStackTrace();
-                } finally {
-                    if(connection != null){
-                        connection.disconnect();
+                    try {
+                        System.out.println(i);
+                        URL url = new URL("http://tingapi.ting.baidu.com/v1/restserver/ting?from=qianqian&version=2.1.0&method=baidu.ting.billboard.billList&format=json&type=" + i + "&offset=0&size=50");
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestMethod("GET");
+                        connection.setConnectTimeout(8000);
+                        Log.i("HttpURLConnection.GET", "开始连接");
+                        connection.connect();
+                        if (connection.getResponseCode() == 200) {
+                            Log.i("HttpURLConnection.GET", "请求成功");
+                            InputStream in = connection.getInputStream();
+                            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                            StringBuilder response = new StringBuilder();
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                response.append(line);
+                            }
+                            ParseJsonUtil parseJsonUtil = new ParseJsonUtil();
+                            String albumImgPath = parseJsonUtil.parseJsonObj(response.toString());
+                            System.out.println(albumImgPath);
+                            List<String> top = parseJsonUtil.parseJsonArr(response.toString());
+                            System.out.println("top:" + top);
+                            Album album = new Album();
+                            album.setAlbumImgPath(albumImgPath);
+                            album.setTop1(top.get(0));
+                            album.setTop2(top.get(1));
+                            album.setTop3(top.get(2));
+                            System.out.println(album);
+                            albums.add(album);
+                            msg.what = i;
+                        } else {
+                            Log.i("HttpURLConnection.GET", "请求失败");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
+                handler.sendMessage(msg);
             }
         }).start();
     }
@@ -92,17 +100,20 @@ public class OnlineMusicFragment extends Fragment {
         @Override
         public void handleMessage(Message msg){
             super.handleMessage(msg);
-            switch (msg.what){
-                case 1:
-                    initRv();
-                    break;
-            }
+//            switch (msg.what){
+//                case 1:
+//                    initRv();
+//                    break;
+//                case 2:
+//                    initRv();
+//                    break;
+//                case 11:
+//                    initRv();
+//                    break;
+//            }
+            initRv();
         }
     };
-
-    private void setAlbum(){
-
-    }
 
     private void initRv(){
         RvAdapter adapter = new RvAdapter(albums);

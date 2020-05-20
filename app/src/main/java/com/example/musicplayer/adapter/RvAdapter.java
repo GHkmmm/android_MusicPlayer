@@ -22,16 +22,19 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Album> mList;
-    Bitmap bitMap_imgPath;
-    MyViewHolder holder;
+//    Bitmap bitMap_imgPath;
+    private List<Bitmap> bitMap_imgPath = new ArrayList<>();
+//    MyViewHolder holder;
 
     public RvAdapter(List<Album> list){
         mList = list;
-        System.out.println(mList);
     }
     @NonNull
     @Override
@@ -42,20 +45,23 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
-        holder = (MyViewHolder) viewHolder;
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, final int position) {
+        final MyViewHolder holder = (MyViewHolder) viewHolder;
         Album album = mList.get(position);
-            String imgPath = album.getAlbumImgPath();
-            System.out.println(imgPath);
-            changeToBitMap(imgPath);
-//            Bitmap bitMap_imgPath = changeToBitMap(imgPath);
-//            System.out.println("imgPath:"+bitMap_imgPath);
-//            holder.cover.setImageBitmap(bitMap_imgPath);
-//
-//            holder.top1.setText("top1");
-//            holder.top2.setText("top2");
-//            holder.top3.setText("top3");
+        String imgPath = album.getAlbumImgPath();
+        changeToBitMap(imgPath);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Message msg = new Message();
+                msg.obj = new Object[]{ holder, position};
+                handler.sendMessage(msg);
+            }
+        },500);
 
+        holder.top1.setText("1."+album.getTop1());
+        holder.top2.setText("2."+album.getTop2());
+        holder.top3.setText("3."+album.getTop3());
     }
 
     @Override
@@ -83,23 +89,23 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Message msg = new Message();
                 URL myFileUrl = null;
                 Bitmap bitmap = null;
-                System.out.println("url:"+url);
                 try {
                     myFileUrl = new URL(url);
                     HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
                     conn.setDoInput(true);
                     conn.connect();
-                    InputStream is = conn.getInputStream();
-                    bitmap = BitmapFactory.decodeStream(is);
-                    System.out.println("bitmap:"+bitmap);
-                    bitMap_imgPath = bitmap;
-                    msg.what = 1;
-                    handler.sendMessage(msg);
+                    if (conn.getResponseCode() == 200) {
+                        InputStream is = conn.getInputStream();
+                        bitmap = BitmapFactory.decodeStream(is);
+                        bitMap_imgPath.add (bitmap);
+                        System.out.println(bitMap_imgPath);
+//                        msg.what = pos;
+//                        System.out.println("pos is"+pos);
+//                        handler.sendMessage(msg);
+                    }
 
-                    is.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -111,16 +117,19 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         @Override
         public void handleMessage(Message msg){
             super.handleMessage(msg);
-            switch (msg.what){
-                case 1:
-                    System.out.println("imgPath:"+bitMap_imgPath);
-                    holder.cover.setImageBitmap(bitMap_imgPath);
-
-                    holder.top1.setText("top1");
-                    holder.top2.setText("top2");
-                    holder.top3.setText("top3");
-                    break;
-            }
+            Object[] objs = (Object[]) msg.obj;
+            System.out.println("obj: "+objs[1]);
+            ((MyViewHolder)objs[0]).cover.setImageBitmap(bitMap_imgPath.get((Integer) objs[1]));
+//            switch (msg.what){
+//                case 0:
+//                    holder.cover.setImageBitmap(bitMap_imgPath.get(0));
+//                    break;
+//                case 1:
+//                    holder.cover.setImageBitmap(bitMap_imgPath.get(1));
+//                    break;
+//                case 2:
+//                    holder.cover.setImageBitmap(bitMap_imgPath.get(2));
+//            }
         }
     };
 }
