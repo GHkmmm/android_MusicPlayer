@@ -7,9 +7,10 @@
     <ImageView
         android:id="@+id/song_list_cover"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_weight="2"
-        app:srcCompat="@drawable/default_cover" />
+        app:srcCompat="@drawable/default_cover"
+        android:layout_gravity="center"/>
 
     <LinearLayout
         android:layout_width="0dp"

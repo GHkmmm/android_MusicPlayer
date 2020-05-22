@@ -43,10 +43,12 @@ public class ParseJsonUtil {
             String title = jsonObj.getString("title");
             String author = jsonObj.getString("author");
             String album_title = jsonObj.getString("album_title");
+            String pic = jsonObj.getString("pic_radio");
 
             songList.setTitle(title);
             songList.setAuthor(author);
             songList.setAlbum_title(album_title);
+            songList.setPic_radio(pic);
 
             songListArray.add(songList);
         }

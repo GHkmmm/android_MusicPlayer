@@ -2,33 +2,49 @@ package com.example.musicplayer;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.widget.ImageView;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
-public class ImgChangeToBitMap {
 
-//    public Bitmap changeToBitMap(String url){
-//        URL myFileUrl = null;
-//        Bitmap bitmap = null;
-//        try {
-//            myFileUrl = new URL(url);
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//        }
-//        try {
-//            HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
-//            conn.setDoInput(true);
-//            conn.connect();
-//            InputStream is = conn.getInputStream();
-//            bitmap = BitmapFactory.decodeStream(is);
-//            is.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return bitmap;
-//    }
+public class ImgChangeToBitMap extends AsyncTask<String,Void, Bitmap> {
+    ImageView imageView;
+
+    public ImgChangeToBitMap(ImageView imageView) {
+        this.imageView = imageView;
+    }
+
+    @Override
+    protected Bitmap doInBackground(String... params) {
+        Bitmap bitmap = null;
+        String url= params[0];  //获取URL
+        URLConnection connection;   //网络连接对象
+        InputStream is;    //数据输入流
+        try {
+            connection = new URL(url).openConnection();
+            is = connection.getInputStream();
+            BufferedInputStream buf = new BufferedInputStream(is);
+            bitmap = BitmapFactory.decodeStream(buf);
+            is.close();
+            buf.close();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bitmap;
+    }
+
+    @Override
+    protected void onPostExecute(Bitmap bitmap) {
+        imageView.setImageBitmap(bitmap);
+    }
 }
+

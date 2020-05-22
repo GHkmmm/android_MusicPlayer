@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.musicplayer.ImgChangeToBitMap;
 import com.example.musicplayer.R;
 import com.example.musicplayer.bean.SongList;
 
@@ -35,6 +36,9 @@ public class songListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         SongList songList = mList.get(position);
         holder.name.setText(songList.getTitle());
         holder.singer.setText(songList.getAuthor());
+        String url = songList.getPic_radio();
+        ImgChangeToBitMap task = new ImgChangeToBitMap(holder.cover);
+        task.execute(url);
     }
 
     @Override
