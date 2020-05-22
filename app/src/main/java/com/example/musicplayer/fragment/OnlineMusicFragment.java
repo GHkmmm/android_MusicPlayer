@@ -1,5 +1,6 @@
 package com.example.musicplayer.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,13 +18,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.musicplayer.ParseJsonUtil;
+import com.example.musicplayer.activity.ListsActivity;
+import com.example.musicplayer.activity.MainActivity;
+import com.example.musicplayer.activity.PlayActivity;
 import com.example.musicplayer.bean.Album;
 import com.example.musicplayer.R;
 import com.example.musicplayer.adapter.RvAdapter;
+import com.example.musicplayer.bean.SongList;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -50,7 +56,9 @@ public class OnlineMusicFragment extends Fragment {
             @Override
             public void run() {
                 Message msg = new Message();
+                int num = 0;
                 for(int i=1;i<12;i++) {
+                    num++;
                     if (i == 3) {
                         i = 11;
                     }
@@ -72,15 +80,14 @@ public class OnlineMusicFragment extends Fragment {
                                 response.append(line);
                             }
                             ParseJsonUtil parseJsonUtil = new ParseJsonUtil();
-                            String albumImgPath = parseJsonUtil.parseJsonObj(response.toString());
-                            System.out.println(albumImgPath);
-                            List<String> top = parseJsonUtil.parseJsonArr(response.toString());
-                            System.out.println("top:" + top);
                             Album album = new Album();
-                            album.setAlbumImgPath(albumImgPath);
-                            album.setTop1(top.get(0));
-                            album.setTop2(top.get(1));
-                            album.setTop3(top.get(2));
+                            album = parseJsonUtil.parseJsonObj(response.toString());
+                            List<SongList> top = parseJsonUtil.parseJsonArr(response.toString());
+                            System.out.println("top:" + top);
+                            album.setTop1(top.get(0).getAlbum_title());
+                            album.setTop2(top.get(1).getAlbum_title());
+                            album.setTop3(top.get(2).getAlbum_title());
+                            album.setSongLists(top);
                             System.out.println(album);
                             albums.add(album);
                             msg.what = i;
@@ -122,8 +129,14 @@ public class OnlineMusicFragment extends Fragment {
         onlineMusicList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         adapter.setOnItemClickListener(new RvAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, Album album) {
+            public void onItemClick(View view, Album album, int position) {
                 Toast.makeText(getActivity(), album.getTop1(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), ListsActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("list", (Serializable) albums);
+                bundle.putInt("position", position);
+                intent.putExtras(bundle);
+                startActivity(intent);
             }
         });
     }

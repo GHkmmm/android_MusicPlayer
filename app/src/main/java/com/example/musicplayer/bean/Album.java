@@ -2,11 +2,51 @@ package com.example.musicplayer.bean;
 
 import android.widget.ImageView;
 
-public class Album {
+import java.io.Serializable;
+import java.util.List;
+
+public class Album implements Serializable {
     String albumImgPath;
+    String name;
+    String updateDate;
+    String comment;
     String top1;
     String top2;
     String top3;
+    List<SongList> songLists;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+
+    public List<SongList> getSongLists() {
+        return songLists;
+    }
+
+    public void setSongLists(List<SongList> songLists) {
+        this.songLists = songLists;
+    }
 
     public String getAlbumImgPath() {
         return albumImgPath;

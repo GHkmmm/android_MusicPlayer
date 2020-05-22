@@ -1,6 +1,8 @@
 package com.example.musicplayer.bean;
 
-public class SongList {
+import java.io.Serializable;
+
+public class SongList implements Serializable {
     String artist_id;//"artist_id": "674713815",
     String language;//"language": "国语",
     String pic_big;//"pic_big": "http://qukufile2.qianqian.com/data2/pic/8b1aab6be81f10639c01c1401a20463c/675021896/675021896.jpg@s_2,w_150,h_150",

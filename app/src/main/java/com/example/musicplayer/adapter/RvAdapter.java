@@ -90,7 +90,7 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 @Override
                 public void onClick(View v) {
                     if(onItemClickListener != null){
-                        onItemClickListener.onItemClick(v, mList.get(getLayoutPosition()));
+                        onItemClickListener.onItemClick(v, mList.get(getLayoutPosition()), getLayoutPosition());
                     }
                 }
             });
@@ -99,7 +99,7 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     public interface OnItemClickListener{
-        public void onItemClick(View view, Album album);
+        public void onItemClick(View view, Album album, int position);
     }
 
     private OnItemClickListener onItemClickListener;
