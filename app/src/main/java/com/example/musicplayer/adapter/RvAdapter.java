@@ -7,8 +7,10 @@ import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,7 +32,7 @@ import java.util.TimerTask;
 public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Album> mList;
 //    Bitmap bitMap_imgPath;
-    private List<Bitmap> bitMap_imgPath = new ArrayList<>();
+    private List<Bitmap> bitMap_imgPath = new ArrayList<Bitmap>(){{add(null); add(null); add(null);}};  ;
 //    MyViewHolder holder;
 
     public RvAdapter(List<Album> list){
@@ -45,11 +47,11 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(@NonNull final RecyclerView.ViewHolder viewHolder, final int position) {
         final MyViewHolder holder = (MyViewHolder) viewHolder;
         Album album = mList.get(position);
         String imgPath = album.getAlbumImgPath();
-        changeToBitMap(imgPath);
+        changeToBitMap(imgPath, position);
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
@@ -62,6 +64,7 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         holder.top1.setText("1."+album.getTop1());
         holder.top2.setText("2."+album.getTop2());
         holder.top3.setText("3."+album.getTop3());
+
     }
 
     @Override
@@ -82,10 +85,31 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             top1 = itemView.findViewById(R.id.top1);
             top2 = itemView.findViewById(R.id.top2);
             top3 = itemView.findViewById(R.id.top3);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(onItemClickListener != null){
+                        onItemClickListener.onItemClick(v, mList.get(getLayoutPosition()));
+                    }
+                }
+            });
         }
+
     }
 
-    public void changeToBitMap(final String url) {
+    public interface OnItemClickListener{
+        public void onItemClick(View view, Album album);
+    }
+
+    private OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+        this.onItemClickListener = onItemClickListener;
+    }
+
+
+    public void changeToBitMap(final String url, final int pos) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -99,7 +123,7 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     if (conn.getResponseCode() == 200) {
                         InputStream is = conn.getInputStream();
                         bitmap = BitmapFactory.decodeStream(is);
-                        bitMap_imgPath.add (bitmap);
+                        bitMap_imgPath.set (pos,bitmap);
                         System.out.println(bitMap_imgPath);
 //                        msg.what = pos;
 //                        System.out.println("pos is"+pos);

@@ -37,8 +37,8 @@ public class LocalMusicFragment extends Fragment {
 
     private void setData(){
         ContentResolver resolver = getActivity().getContentResolver();
-        util = new GetMusicUtil();
-        songList= util.getMusic(resolver);
+        util = new GetMusicUtil(resolver);
+        songList= util.getMusic();
         System.out.println("songList-----"+songList);
     }
 

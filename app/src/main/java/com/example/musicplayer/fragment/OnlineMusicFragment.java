@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,7 +41,6 @@ public class OnlineMusicFragment extends Fragment {
         onlineMusicList = view.findViewById(R.id.onlineMusic_list);
         getData();
         initRv();
-        onlineMusicList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         return view;
     }
 
@@ -119,5 +119,12 @@ public class OnlineMusicFragment extends Fragment {
         RvAdapter adapter = new RvAdapter(albums);
         onlineMusicList.setLayoutManager(new LinearLayoutManager(getActivity()));
         onlineMusicList.setAdapter(adapter);
+        onlineMusicList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        adapter.setOnItemClickListener(new RvAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, Album album) {
+                Toast.makeText(getActivity(), album.getTop1(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

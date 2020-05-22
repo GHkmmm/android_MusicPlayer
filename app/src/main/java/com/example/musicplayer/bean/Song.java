@@ -1,12 +1,25 @@
 package com.example.musicplayer.bean;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+
 public class Song {
     private String name;
     public String singer;//歌手
     public long size;//歌曲所占空间大小
     public long duration;//歌曲时间长度
     public String url;//歌曲地址
-    public String album;//图片id
+    public String album;//专辑名称
+    public Bitmap album_img;
+
+    public Bitmap getAlbum_img() {
+        return album_img;
+    }
+
+    public void setAlbum_img(Bitmap album_img) {
+        this.album_img = album_img;
+    }
+
     public long id;//歌曲id
 
     public String getName() {

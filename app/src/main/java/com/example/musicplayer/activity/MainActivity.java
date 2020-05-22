@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 homeViewPager.setCurrentItem(position);
+                //设置顶部文字颜色
                 switch (position){
                     case 0:
                         localMusic.setTextColor(getResources().getColor(R.color.textColor));
@@ -98,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
         goPlayView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("click go");
                 Intent intent = new Intent(MainActivity.this, PlayActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("name", songName.getText().toString());
@@ -107,7 +107,18 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
+        localMusic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                homeViewPager.setCurrentItem(0);
+            }
+        });
+        onlineMusic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                homeViewPager.setCurrentItem(1);
+            }
+        });
 
     }
 }
