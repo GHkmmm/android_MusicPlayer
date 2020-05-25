@@ -1,8 +1,6 @@
 package com.example.musicplayer.adapter;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +18,7 @@ import java.util.List;
 
 public class LocalMusicListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     List<Song> mList;
+    private LocalMusicListAdapter.OnItemClickListener onItemClickListener;
 
     public LocalMusicListAdapter(List<Song> list){
         mList = list;
@@ -62,6 +61,23 @@ public class LocalMusicListAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             cover = itemView.findViewById(R.id.lm_cover);
             name = itemView.findViewById(R.id.lm_name);
             singer = itemView.findViewById(R.id.lm_singer);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(onItemClickListener != null){
+                        onItemClickListener.onItemClick(v, mList.get(getLayoutPosition()), getLayoutPosition());
+                    }
+                }
+            });
         }
+    }
+
+    public interface OnItemClickListener{
+        public void onItemClick(View view, Song song, int position);
+    }
+
+    public void setOnItemClickListener(LocalMusicListAdapter.OnItemClickListener onItemClickListener){
+        this.onItemClickListener = onItemClickListener;
     }
 }

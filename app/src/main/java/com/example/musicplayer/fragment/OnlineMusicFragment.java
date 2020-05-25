@@ -57,10 +57,13 @@ public class OnlineMusicFragment extends Fragment {
             public void run() {
                 Message msg = new Message();
                 int num = 0;
-                for(int i=1;i<12;i++) {
+                for(int i=1;i<26;i++) {
                     num++;
                     if (i == 3) {
                         i = 11;
+                    }
+                    if (i == 12) {
+                        i = 21;
                     }
                     try {
                         System.out.println(i);
@@ -107,17 +110,6 @@ public class OnlineMusicFragment extends Fragment {
         @Override
         public void handleMessage(Message msg){
             super.handleMessage(msg);
-//            switch (msg.what){
-//                case 1:
-//                    initRv();
-//                    break;
-//                case 2:
-//                    initRv();
-//                    break;
-//                case 11:
-//                    initRv();
-//                    break;
-//            }
             initRv();
         }
     };

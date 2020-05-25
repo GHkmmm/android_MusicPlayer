@@ -15,6 +15,7 @@ import android.widget.ImageView;
 
 import com.example.musicplayer.bean.Song;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class GetMusicUtil {
@@ -57,6 +58,7 @@ public class GetMusicUtil {
                 song.setAlbum_img(bm);
 
                 System.out.println(name+"-----"+album);
+                System.out.println("path is ======"+url);
 
                 mList.add(song);
 
@@ -72,7 +74,7 @@ public class GetMusicUtil {
         String mUriAlbums = "content://media/external/audio/albums";
         String[] projection = new String[] { "album_art" };
         System.out.println("id========"+album_id);
-        Cursor cur = resolver.query( Uri.parse(mUriAlbums + "/" + Integer.toString(album_id)), null, null, null, null);
+        Cursor cur = resolver.query( Uri.parse(mUriAlbums + "/" + Integer.toString(album_id)), projection, null, null, null);
         System.out.println("cur-----------"+cur);
         String album_art = null;
         if (cur.getCount() > 0 && cur.getColumnCount() > 0){
@@ -85,17 +87,4 @@ public class GetMusicUtil {
         return album_art;
     }
 
-    public static Bitmap setArtwork(String url) {
-
-        MediaMetadataRetriever mediaMetadataRetriever=new MediaMetadataRetriever();
-        mediaMetadataRetriever.setDataSource(url);
-        byte[] picture = mediaMetadataRetriever.getEmbeddedPicture();
-        Bitmap bMap= BitmapFactory.decodeByteArray(picture,0,picture.length);
-        return bMap;
-    }
-
-    public static Uri getMediaStoreAlbumCoverUri(int albumId) {
-        Uri artworkUri = Uri.parse("content://media/external/audio/albumart");
-        return ContentUris.withAppendedId(artworkUri, albumId);
-    }
 }

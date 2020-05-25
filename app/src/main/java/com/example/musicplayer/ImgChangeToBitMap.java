@@ -13,7 +13,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
-
+/**
+ * 加载网络图片的类 并且加载到对应到imageView上
+ */
 public class ImgChangeToBitMap extends AsyncTask<String,Void, Bitmap> {
     ImageView imageView;
 

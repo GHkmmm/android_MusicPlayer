@@ -103,7 +103,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/play_or_pause"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_play_bar_btn_play" />

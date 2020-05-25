@@ -69,8 +69,7 @@ public class ListsActivity extends AppCompatActivity {
         songLists = albums.get(position).getSongLists();
 
         String url = albums.get(position).getAlbumImgPath();
-//        ImageDownloadTask task = new ImageDownloadTask();
-//        task.execute(url);
+
         ImgChangeToBitMap task = new ImgChangeToBitMap(albumImg);
         task.execute(url);
     }

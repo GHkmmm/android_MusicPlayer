@@ -31,9 +31,6 @@ import java.util.TimerTask;
 
 public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Album> mList;
-//    Bitmap bitMap_imgPath;
-    private List<Bitmap> bitMap_imgPath = new ArrayList<Bitmap>(){{add(null); add(null); add(null);}};  ;
-//    MyViewHolder holder;
 
     public RvAdapter(List<Album> list){
         mList = list;
@@ -51,15 +48,8 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         final MyViewHolder holder = (MyViewHolder) viewHolder;
         Album album = mList.get(position);
         String imgPath = album.getAlbumImgPath();
-        changeToBitMap(imgPath, position);
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                Message msg = new Message();
-                msg.obj = new Object[]{ holder, position};
-                handler.sendMessage(msg);
-            }
-        },500);
+        ImgChangeToBitMap task = new ImgChangeToBitMap(holder.cover);
+        task.execute(imgPath);
 
         holder.top1.setText("1."+album.getTop1());
         holder.top2.setText("2."+album.getTop2());
@@ -109,51 +99,4 @@ public class RvAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
 
-    public void changeToBitMap(final String url, final int pos) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                URL myFileUrl = null;
-                Bitmap bitmap = null;
-                try {
-                    myFileUrl = new URL(url);
-                    HttpURLConnection conn = (HttpURLConnection) myFileUrl.openConnection();
-                    conn.setDoInput(true);
-                    conn.connect();
-                    if (conn.getResponseCode() == 200) {
-                        InputStream is = conn.getInputStream();
-                        bitmap = BitmapFactory.decodeStream(is);
-                        bitMap_imgPath.set (pos,bitmap);
-                        System.out.println(bitMap_imgPath);
-//                        msg.what = pos;
-//                        System.out.println("pos is"+pos);
-//                        handler.sendMessage(msg);
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-    Handler handler = new Handler(){
-        @Override
-        public void handleMessage(Message msg){
-            super.handleMessage(msg);
-            Object[] objs = (Object[]) msg.obj;
-            System.out.println("obj: "+objs[1]);
-            ((MyViewHolder)objs[0]).cover.setImageBitmap(bitMap_imgPath.get((Integer) objs[1]));
-//            switch (msg.what){
-//                case 0:
-//                    holder.cover.setImageBitmap(bitMap_imgPath.get(0));
-//                    break;
-//                case 1:
-//                    holder.cover.setImageBitmap(bitMap_imgPath.get(1));
-//                    break;
-//                case 2:
-//                    holder.cover.setImageBitmap(bitMap_imgPath.get(2));
-//            }
-        }
-    };
 }
