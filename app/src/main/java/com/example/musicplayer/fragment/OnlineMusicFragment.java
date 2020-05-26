@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -17,6 +19,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.musicplayer.ImgChangeToBitMap;
 import com.example.musicplayer.ParseJsonUtil;
 import com.example.musicplayer.activity.ListsActivity;
 import com.example.musicplayer.activity.MainActivity;
@@ -24,6 +27,7 @@ import com.example.musicplayer.activity.PlayActivity;
 import com.example.musicplayer.bean.Album;
 import com.example.musicplayer.R;
 import com.example.musicplayer.adapter.RvAdapter;
+import com.example.musicplayer.bean.Song;
 import com.example.musicplayer.bean.SongList;
 
 import java.io.BufferedReader;
@@ -39,12 +43,19 @@ public class OnlineMusicFragment extends Fragment {
     private RecyclerView onlineMusicList;
     private List<Album> albums = new ArrayList<>();
     private List<URL> urls = new ArrayList<>();
+    private ImageView goPlayListView;
+    private ImageView cover, playBtn;
+    private TextView name, singer;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.onlinemusic_fragment, container, false);
         onlineMusicList = view.findViewById(R.id.onlineMusic_list);
+        cover = getActivity().findViewById(R.id.goListViewBtn);
+        playBtn = getActivity().findViewById(R.id.play_or_pause);
+        name = getActivity().findViewById(R.id.song_name);
+        singer = getActivity().findViewById(R.id.song_lyrics);
         getData();
         initRv();
         return view;
@@ -128,8 +139,18 @@ public class OnlineMusicFragment extends Fragment {
                 bundle.putSerializable("list", (Serializable) albums);
                 bundle.putInt("position", position);
                 intent.putExtras(bundle);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Song song = (Song) data.getExtras().getSerializable("song");//得到新Activity 关闭后返回的数据
+        ImgChangeToBitMap task = new ImgChangeToBitMap(cover);
+        task.execute(song.getImgPath());
+        name.setText(song.getName());
+        singer.setText(song.getSinger());
+        playBtn.setImageResource(R.drawable.ic_play_bar_btn_pause);
     }
 }

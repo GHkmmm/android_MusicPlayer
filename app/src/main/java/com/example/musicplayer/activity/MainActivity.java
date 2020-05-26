@@ -40,13 +40,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        localMusic = findViewById(R.id.goLocalMusic);
-        onlineMusic = findViewById(R.id.goOnlineMusic);
-        homeViewPager = findViewById(R.id.home_viewPager);
-        goPlayListView = findViewById(R.id.goListBtn);
-        goPlayView = findViewById(R.id.goListViewBtn);
-        songName = findViewById(R.id.song_name);
-        songLyrics = findViewById(R.id.song_lyrics);
+        initView();
 
         int REQUEST_EXTERNAL_STORAGE = 1;
         String[] PERMISSIONS_STORAGE = {
@@ -138,6 +132,20 @@ public class MainActivity extends AppCompatActivity {
                 homeViewPager.setCurrentItem(1);
             }
         });
+
+    }
+    public void initView(){
+        localMusic = findViewById(R.id.goLocalMusic);
+        onlineMusic = findViewById(R.id.goOnlineMusic);
+        homeViewPager = findViewById(R.id.home_viewPager);
+        goPlayListView = findViewById(R.id.goListBtn);
+        goPlayView = findViewById(R.id.goListViewBtn);
+        songName = findViewById(R.id.song_name);
+        songLyrics = findViewById(R.id.song_lyrics);
+    }
+
+    public void getSong(){
+//        Intent getSongIntent = new Intent();
 
     }
 }

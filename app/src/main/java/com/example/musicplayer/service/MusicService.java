@@ -95,18 +95,6 @@ public class MusicService extends Service {
             }
         }
 
-        public void playOnlineMusic(String url) {
-            try{
-                player.reset();
-                player.setDataSource(url);
-                player.prepare();
-                addTimer();
-                player.start();
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-        }
-
         public void pausePlay(){
             player.pause();
         }

@@ -44,6 +44,8 @@ public class PlayActivity extends AppCompatActivity {
     private ServiceConnection conn;
     private ContentReceiver mReceiver;
     Boolean isPlaying = false;
+    Intent serviceIntent;
+    Boolean isUnbind = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +143,7 @@ public class PlayActivity extends AppCompatActivity {
         playOrPauseBtn = findViewById(R.id.play_play_or_pause);
         songCurrentDuration = findViewById(R.id.current_duration);
         songDuration = findViewById(R.id.duration);
+        serviceIntent = new Intent(PlayActivity.this, MusicService.class);
         conn = new MyServiceConn();
         bindService(new Intent(PlayActivity.this, MusicService.class), conn, BIND_AUTO_CREATE);
 
@@ -216,55 +219,18 @@ public class PlayActivity extends AppCompatActivity {
         }
     }
 
-    public static Handler handler = new Handler(){
-        @Override
-        public void handleMessage(@NonNull Message msg) {
-//            super.handleMessage(msg);
-            Bundle bundle = msg.getData();
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(mReceiver);
+        myUnbind();
+        super.onDestroy();
+    }
 
-            int duration = bundle.getInt("duration");
-            int currentDuration = bundle.getInt("currentDuration");
-            System.out.println(duration);
-//
-            sb.setMax(duration); //设置总长度
-            sb.setProgress(currentDuration); //设置当前进度值
-
-            int min = duration / 1000 / 60;
-            int sec = duration / 1000 % 60;
-
-            String strMin = "";
-            String strSec = "";
-            if(min<10){
-                strMin = "0"+min;
-            }else {
-                strMin = min+"";
-            }
-
-            if(sec<10){
-                strSec = "0"+sec;
-            }else {
-                strSec = sec+"";
-            }
-
-            //设置进度条
-            songDuration.setText(strMin + ":" + strSec);
-
-            min = currentDuration / 1000 / 60;
-            sec = currentDuration / 1000 % 60;
-
-            if(min<10){
-                strMin = "0"+min;
-            }else {
-                strMin = min+"";
-            }
-
-            if(sec<10){
-                strSec = "0"+sec;
-            }else {
-                strSec = sec+"";
-            }
-
-            songCurrentDuration.setText(strMin + ":" + strSec);
+    private void myUnbind(){
+        if(!isUnbind){
+            isUnbind = true;
+            unbindService(conn); //解绑服务
+            stopService(serviceIntent); //停止服务
         }
-    };
+    }
 }

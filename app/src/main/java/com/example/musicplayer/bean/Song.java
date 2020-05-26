@@ -3,7 +3,9 @@ package com.example.musicplayer.bean;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 
-public class Song {
+import java.io.Serializable;
+
+public class Song implements Serializable {
     private String name;
     public String singer;//歌手
     public long size;//歌曲所占空间大小
@@ -11,6 +13,15 @@ public class Song {
     public String url;//歌曲地址
     public String album;//专辑名称
     public Bitmap album_img;
+    public String imgPath;
+
+    public String getImgPath() {
+        return imgPath;
+    }
+
+    public void setImgPath(String imgPath) {
+        this.imgPath = imgPath;
+    }
 
     public Bitmap getAlbum_img() {
         return album_img;

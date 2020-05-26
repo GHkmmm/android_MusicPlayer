@@ -135,7 +135,13 @@ public class LocalMusicFragment extends Fragment {
         }
     }
 
-    private void myUnbind(boolean isUnbind){
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        myUnbind();
+    }
+
+    private void myUnbind(){
         if(!isUnbind){
             isUnbind = true;
             musicControl.pausePlay(); //暂停播放

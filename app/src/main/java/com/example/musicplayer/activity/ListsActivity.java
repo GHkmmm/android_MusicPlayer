@@ -29,6 +29,7 @@ import com.example.musicplayer.service.MusicService;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -41,11 +42,13 @@ public class ListsActivity extends AppCompatActivity {
     TextView albumName, updateDate, comment;
     RecyclerView songList;
     List<SongList> songLists;
+    Song song;
 
     private MusicService.MusicControl musicControl; //Binder实例
     private MyServiceConn myServiceConn; //连接实例
 
     private Intent intent;
+    Boolean isUnbind = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -116,9 +119,14 @@ public class ListsActivity extends AppCompatActivity {
                                     response.append(line);
                                 }
                                 ParseJsonUtil parseJsonUtil = new ParseJsonUtil();
-                                Song song = new Song();
                                 song = parseJsonUtil.parseSongJson(response.toString());
-                                musicControl.playOnlineMusic(song.getUrl());
+                                musicControl.play(song.getUrl());
+                                Intent backIntent = new Intent();
+                                Bundle bundle = new Bundle();
+                                bundle.putSerializable("song", (Serializable) song);
+                                backIntent.putExtras(bundle);
+                                ListsActivity.this.setResult(RESULT_OK, backIntent);
+                                ListsActivity.this.finish();
                             }else {
                                 Log.i("HttpURLConnection.GET", "请求失败");
                             }
@@ -142,5 +150,12 @@ public class ListsActivity extends AppCompatActivity {
         public void onServiceDisconnected(ComponentName name) {
 
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(myServiceConn); //解绑服务
+        stopService(intent); //停止服务
     }
 }

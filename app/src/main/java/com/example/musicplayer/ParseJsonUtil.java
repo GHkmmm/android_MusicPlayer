@@ -1,6 +1,8 @@
 package com.example.musicplayer;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 
 import com.example.musicplayer.bean.Album;
 import com.example.musicplayer.bean.Song;
@@ -47,11 +49,13 @@ public class ParseJsonUtil {
         String name = songInfo.getString("title");
         String singer = songInfo.getString("author");
         String duration = bitrate.getString("file_duration");
+        String imgUrl = songInfo.getString("pic_radio");
 
         song.setUrl(url);
         song.setName(name);
         song.setSinger(singer);
         song.setDuration((Long.parseLong(duration)));
+        song.setImgPath(imgUrl);
 
         return song;
     }
