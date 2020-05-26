@@ -114,6 +114,7 @@ public class MusicService extends Service {
         Bundle bundle = new Bundle();
         bundle.putInt("duration", duration);
         bundle.putInt("currentDuration", currentDuration);
+        bundle.putBoolean("isPlaying", player.isPlaying());
         intent.putExtras(bundle);
         sendBroadcast(intent);
     }

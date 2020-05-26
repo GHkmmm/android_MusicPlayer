@@ -126,7 +126,7 @@
                 app:srcCompat="@drawable/ic_play_btn_prev" />
 
             <ImageView
-                android:id="@+id/imageView10"
+                android:id="@+id/play_play_or_pause"
                 android:layout_width="100dp"
                 android:layout_height="match_parent"
                 app:srcCompat="@drawable/ic_play_btn_pause" />

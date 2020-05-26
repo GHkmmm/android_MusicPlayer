@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -37,27 +39,17 @@ public class PlayActivity extends AppCompatActivity {
     private TextView name, lyrics, circle1, circle2;
     private static TextView songCurrentDuration, songDuration;
     private static SeekBar sb;
+    private ImageView playOrPauseBtn;
     private MusicService.MusicControl service;
     private ServiceConnection conn;
     private ContentReceiver mReceiver;
+    Boolean isPlaying = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play);
-        //查找元素
-        name = findViewById(R.id.play_view_name);
-        lyrics = findViewById(R.id.play_view_lyrics);
-        viewPager = findViewById(R.id.viewPager);
-        circle1 = findViewById(R.id.circle1);
-        circle2 = findViewById(R.id.circle2);
-        sb = findViewById(R.id.seekBar);
-        songCurrentDuration = findViewById(R.id.current_duration);
-        songDuration = findViewById(R.id.duration);
-        conn = new MyServiceConn();
-        bindService(new Intent(PlayActivity.this, MusicService.class), conn, BIND_AUTO_CREATE);
-
-        System.out.println("sb is ======="+sb);
+        initView();
 
         albumFragment = new AlbumFragment();
         lyricsFragment = new LyricsFragment();
@@ -106,6 +98,53 @@ public class PlayActivity extends AppCompatActivity {
         lyrics.setText(bundle.getString("lyrics"));
 
         doRegisterReceiver();
+
+        sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+            //停止滑动时的处理
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                int progress = seekBar.getProgress();
+                service.seekTo(progress);
+            }
+        });
+        playOrPauseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isPlaying){
+                    service.pausePlay();
+                    playOrPauseBtn.setImageResource(R.drawable.ic_play_btn_play);
+                }else {
+                    service.continuePlay();
+                    playOrPauseBtn.setImageResource(R.drawable.ic_play_btn_pause);
+                }
+            }
+        });
+    }
+
+    public void initView(){
+        //查找元素
+        name = findViewById(R.id.play_view_name);
+        lyrics = findViewById(R.id.play_view_lyrics);
+        viewPager = findViewById(R.id.viewPager);
+        circle1 = findViewById(R.id.circle1);
+        circle2 = findViewById(R.id.circle2);
+        sb = findViewById(R.id.seekBar);
+        playOrPauseBtn = findViewById(R.id.play_play_or_pause);
+        songCurrentDuration = findViewById(R.id.current_duration);
+        songDuration = findViewById(R.id.duration);
+        conn = new MyServiceConn();
+        bindService(new Intent(PlayActivity.this, MusicService.class), conn, BIND_AUTO_CREATE);
+
+        System.out.println("sb is ======="+sb);
     }
 
     private void doRegisterReceiver() {
@@ -133,7 +172,7 @@ public class PlayActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             int currentDuration = intent.getExtras().getInt("currentDuration");
             int duration = intent.getExtras().getInt("duration");
-            System.out.println("currentDuration is ======="+ currentDuration);
+            isPlaying = intent.getExtras().getBoolean("isPlaying");
 
             sb.setMax(duration); //设置总长度
             sb.setProgress(currentDuration); //设置当前进度值
