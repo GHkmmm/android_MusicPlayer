@@ -56,6 +56,25 @@ public class songListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             cover = itemView.findViewById(R.id.song_list_cover);
             name = itemView.findViewById(R.id.song_list_name);
             singer = itemView.findViewById(R.id.song_list_singer);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(onItemClickListener != null){
+                        onItemClickListener.onItemClick(v, mList.get(getLayoutPosition()), getLayoutPosition());
+                    }
+                }
+            });
         }
+    }
+
+    public interface OnItemClickListener{
+        public void onItemClick(View view, SongList songList, int position);
+    }
+
+    private OnItemClickListener onItemClickListener;
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+        this.onItemClickListener = onItemClickListener;
     }
 }

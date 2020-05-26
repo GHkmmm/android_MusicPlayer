@@ -1,6 +1,9 @@
 package com.example.musicplayer;
 
+import android.graphics.Bitmap;
+
 import com.example.musicplayer.bean.Album;
+import com.example.musicplayer.bean.Song;
 import com.example.musicplayer.bean.SongList;
 
 import org.json.JSONArray;
@@ -34,6 +37,25 @@ public class ParseJsonUtil {
         return album;
     }
 
+    public Song parseSongJson(String response) throws JSONException{
+        Song song = new Song();
+        JSONObject jsonObject = new JSONObject(response);
+        JSONObject bitrate = new JSONObject(jsonObject.getString("bitrate"));
+        JSONObject songInfo = new JSONObject(jsonObject.getString("songinfo"));
+
+        String url = bitrate.getString("show_link");
+        String name = songInfo.getString("title");
+        String singer = songInfo.getString("author");
+        String duration = bitrate.getString("file_duration");
+
+        song.setUrl(url);
+        song.setName(name);
+        song.setSinger(singer);
+        song.setDuration((Long.parseLong(duration)));
+
+        return song;
+    }
+
     public List<SongList> parseJsonArr(String response) throws JSONException {
         songListArray = new ArrayList<>();
         JSONArray jsonArray = new JSONObject(response).getJSONArray("song_list");
@@ -44,11 +66,13 @@ public class ParseJsonUtil {
             String author = jsonObj.getString("author");
             String album_title = jsonObj.getString("album_title");
             String pic = jsonObj.getString("pic_radio");
+            String id = jsonObj.getString("song_id");
 
             songList.setTitle(title);
             songList.setAuthor(author);
             songList.setAlbum_title(album_title);
             songList.setPic_radio(pic);
+            songList.setSong_id(id);
 
             songListArray.add(songList);
         }

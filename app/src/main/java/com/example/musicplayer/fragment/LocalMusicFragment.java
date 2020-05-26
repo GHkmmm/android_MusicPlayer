@@ -56,6 +56,7 @@ public class LocalMusicFragment extends Fragment {
 
     private boolean isUnbind = false;
     private ContentReceiver mReceiver;
+    Boolean isPlaying = false;
 
 
     @Nullable
@@ -70,6 +71,18 @@ public class LocalMusicFragment extends Fragment {
         initView();
         setData();
         initRv();
+        playBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isPlaying){
+                    musicControl.pausePlay();
+                    playBtn.setImageResource(R.drawable.ic_play_bar_btn_play);
+                }else {
+                    musicControl.continuePlay();
+                    playBtn.setImageResource(R.drawable.ic_play_bar_btn_pause);
+                }
+            }
+        });
         doRegisterReceiver();
         return view;
     }
@@ -93,21 +106,6 @@ public class LocalMusicFragment extends Fragment {
         lmAdapter.setOnItemClickListener(new LocalMusicListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, Song song, int position) {
-//                int REQUEST_EXTERNAL_STORAGE = 1;
-//                String[] PERMISSIONS_STORAGE = {
-//                        Manifest.permission.READ_EXTERNAL_STORAGE,
-//                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-//                };
-//                int permission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//
-//                if (permission != PackageManager.PERMISSION_GRANTED) {
-//                    // We don't have permission so prompt the user
-//                    ActivityCompat.requestPermissions(
-//                            getActivity(),
-//                            PERMISSIONS_STORAGE,
-//                            REQUEST_EXTERNAL_STORAGE
-//                    );
-//                }
 
                 Toast.makeText(getActivity(), "正在播放："+song.getName(), Toast.LENGTH_SHORT).show();
                 name.setText(song.getName());
@@ -118,15 +116,6 @@ public class LocalMusicFragment extends Fragment {
         });
     }
 
-//    public static Handler handler = new Handler(){
-//        @Override
-//        public void handleMessage(@NonNull final Message msg) {
-////            super.handleMessage(msg);
-//            System.out.println("currentDuration is ======="+ msg.getData().getInt("currentDuration"));
-//            currentDuration = msg.getData().getInt("currentDuration");
-//            duration = msg.getData().getInt("duration");
-//        }
-//    };
     private void doRegisterReceiver(){
         mReceiver = new ContentReceiver();
         IntentFilter filter = new IntentFilter("com.example.musicplayer.service");
@@ -161,6 +150,7 @@ public class LocalMusicFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             int currentDuration = intent.getExtras().getInt("currentDuration");
             int duration = intent.getExtras().getInt("duration");
+            isPlaying = intent.getExtras().getBoolean("isPlaying");
         }
     }
 }
