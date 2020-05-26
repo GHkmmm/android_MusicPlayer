@@ -81,15 +81,15 @@ public class MusicService extends Service {
 
         public void play(String path) {
             System.out.println(path);
-            player.reset();
             try {
+                player.reset();
 //                player = MediaPlayer.create(getApplicationContext(), R.raw.test);
                 player.setDataSource(path);
                 player.prepare();
+                player.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            player.start();
         }
 
         public void pausePlay(){
