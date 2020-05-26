@@ -39,15 +39,15 @@ public class MusicService extends Service {
         player = new MediaPlayer();
     }
 
-//    public void addTimer(){
-//        if(timer == null){
-//            timer = new Timer();
-//            TimerTask task = new TimerTask() {
-//                @Override
-//                public void run() {
-//                    if(player == null) return;
-//                    int duration = player.getDuration();
-//                    int currentDuration = player.getCurrentPosition();
+    public void addTimer(){
+        if(timer == null){
+            timer = new Timer();
+            TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+                    if(player == null) return;
+                    int duration = player.getDuration();
+                    int currentDuration = player.getCurrentPosition();
 //                    Message msg = LocalMusicFragment.handler.obtainMessage();
 //                    Bundle bundle = new Bundle();
 //                    bundle.putInt("duration", duration);
@@ -55,11 +55,12 @@ public class MusicService extends Service {
 //                    msg.setData(bundle);
 //
 //                    LocalMusicFragment.handler.sendMessage(msg);
-//                }
-//            };
-//            timer.schedule(task, 5, 500);
-//        }
-//    }
+                    sendContentBroadcast(duration, currentDuration);
+                }
+            };
+            timer.schedule(task, 5, 500);
+        }
+    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -86,6 +87,8 @@ public class MusicService extends Service {
 //                player = MediaPlayer.create(getApplicationContext(), R.raw.test);
                 player.setDataSource(path);
                 player.prepare();
+
+                addTimer();
                 player.start();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -103,5 +106,15 @@ public class MusicService extends Service {
         public void seekTo(int progress){
             player.seekTo(progress); //设置音乐播放位置
         }
+    }
+
+    protected void sendContentBroadcast(int duration, int currentDuration){
+        Intent intent = new Intent();
+        intent.setAction("com.example.musicplayer.service");
+        Bundle bundle = new Bundle();
+        bundle.putInt("duration", duration);
+        bundle.putInt("currentDuration", currentDuration);
+        intent.putExtras(bundle);
+        sendBroadcast(intent);
     }
 }

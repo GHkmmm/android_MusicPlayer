@@ -2,10 +2,12 @@ package com.example.musicplayer.fragment;
 
 import android.Manifest;
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,13 +32,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.musicplayer.GetMusicUtil;
 import com.example.musicplayer.R;
 import com.example.musicplayer.activity.MainActivity;
+import com.example.musicplayer.activity.PlayActivity;
 import com.example.musicplayer.adapter.LocalMusicListAdapter;
 import com.example.musicplayer.bean.Song;
 import com.example.musicplayer.service.MusicService;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class LocalMusicFragment extends Fragment {
+    private static Timer timer;
     private ImageView cover, playBtn;
     private TextView name, singer;
     private ArrayList<Song> songList;
@@ -48,6 +55,7 @@ public class LocalMusicFragment extends Fragment {
     private Intent intent;
 
     private boolean isUnbind = false;
+    private ContentReceiver mReceiver;
 
 
     @Nullable
@@ -59,10 +67,10 @@ public class LocalMusicFragment extends Fragment {
         playBtn = getActivity().findViewById(R.id.play_or_pause);
         name = getActivity().findViewById(R.id.song_name);
         singer = getActivity().findViewById(R.id.song_lyrics);
-        System.out.println("name is ======="+name);
         initView();
         setData();
         initRv();
+        doRegisterReceiver();
         return view;
     }
 
@@ -70,7 +78,6 @@ public class LocalMusicFragment extends Fragment {
         intent = new Intent(getActivity(), MusicService.class);
         myServiceConn = new MyServiceConn();
         getActivity().bindService(intent, myServiceConn, Context.BIND_AUTO_CREATE);
-//        bindService(intent, MyServiceConn, BIND_AUTO_CREATE);
     }
 
     private void setData(){
@@ -86,21 +93,21 @@ public class LocalMusicFragment extends Fragment {
         lmAdapter.setOnItemClickListener(new LocalMusicListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, Song song, int position) {
-                int REQUEST_EXTERNAL_STORAGE = 1;
-                String[] PERMISSIONS_STORAGE = {
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE
-                };
-                int permission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
-
-                if (permission != PackageManager.PERMISSION_GRANTED) {
-                    // We don't have permission so prompt the user
-                    ActivityCompat.requestPermissions(
-                            getActivity(),
-                            PERMISSIONS_STORAGE,
-                            REQUEST_EXTERNAL_STORAGE
-                    );
-                }
+//                int REQUEST_EXTERNAL_STORAGE = 1;
+//                String[] PERMISSIONS_STORAGE = {
+//                        Manifest.permission.READ_EXTERNAL_STORAGE,
+//                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+//                };
+//                int permission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+//
+//                if (permission != PackageManager.PERMISSION_GRANTED) {
+//                    // We don't have permission so prompt the user
+//                    ActivityCompat.requestPermissions(
+//                            getActivity(),
+//                            PERMISSIONS_STORAGE,
+//                            REQUEST_EXTERNAL_STORAGE
+//                    );
+//                }
 
                 Toast.makeText(getActivity(), "正在播放："+song.getName(), Toast.LENGTH_SHORT).show();
                 name.setText(song.getName());
@@ -113,10 +120,18 @@ public class LocalMusicFragment extends Fragment {
 
 //    public static Handler handler = new Handler(){
 //        @Override
-//        public void handleMessage(@NonNull Message msg) {
-//            super.handleMessage(msg);
+//        public void handleMessage(@NonNull final Message msg) {
+////            super.handleMessage(msg);
+//            System.out.println("currentDuration is ======="+ msg.getData().getInt("currentDuration"));
+//            currentDuration = msg.getData().getInt("currentDuration");
+//            duration = msg.getData().getInt("duration");
 //        }
 //    };
+    private void doRegisterReceiver(){
+        mReceiver = new ContentReceiver();
+        IntentFilter filter = new IntentFilter("com.example.musicplayer.service");
+        getActivity().registerReceiver(mReceiver, filter);
+    }
 
     class MyServiceConn implements ServiceConnection {
 
@@ -131,12 +146,21 @@ public class LocalMusicFragment extends Fragment {
         }
     }
 
-//    private void myUnbind(boolean isUnbind){
-//        if(!isUnbind){
-//            isUnbind = true;
-//            musicControl.pausePlay(); //暂停播放
-//            unbindService(myServiceConn); //解绑服务
-//            stopService(intent); //停止服务
-//        }
-//    }
+    private void myUnbind(boolean isUnbind){
+        if(!isUnbind){
+            isUnbind = true;
+            musicControl.pausePlay(); //暂停播放
+            getActivity().unbindService(myServiceConn); //解绑服务
+            getActivity().stopService(intent); //停止服务
+        }
+    }
+
+    public class ContentReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int currentDuration = intent.getExtras().getInt("currentDuration");
+            int duration = intent.getExtras().getInt("duration");
+        }
+    }
 }

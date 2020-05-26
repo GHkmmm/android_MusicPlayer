@@ -1,9 +1,19 @@
 package com.example.musicplayer.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -13,6 +23,7 @@ import com.example.musicplayer.R;
 import com.example.musicplayer.adapter.ViewPagerAdapter;
 import com.example.musicplayer.fragment.AlbumFragment;
 import com.example.musicplayer.fragment.LyricsFragment;
+import com.example.musicplayer.service.MusicService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +35,11 @@ public class PlayActivity extends AppCompatActivity {
     private AlbumFragment albumFragment;
     private LyricsFragment lyricsFragment;
     private TextView name, lyrics, circle1, circle2;
+    private static TextView songCurrentDuration, songDuration;
+    private static SeekBar sb;
+    private MusicService.MusicControl service;
+    private ServiceConnection conn;
+    private ContentReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +51,13 @@ public class PlayActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.viewPager);
         circle1 = findViewById(R.id.circle1);
         circle2 = findViewById(R.id.circle2);
+        sb = findViewById(R.id.seekBar);
+        songCurrentDuration = findViewById(R.id.current_duration);
+        songDuration = findViewById(R.id.duration);
+        conn = new MyServiceConn();
+        bindService(new Intent(PlayActivity.this, MusicService.class), conn, BIND_AUTO_CREATE);
+
+        System.out.println("sb is ======="+sb);
 
         albumFragment = new AlbumFragment();
         lyricsFragment = new LyricsFragment();
@@ -81,5 +104,128 @@ public class PlayActivity extends AppCompatActivity {
 
         name.setText(bundle.getString("name"));
         lyrics.setText(bundle.getString("lyrics"));
+
+        doRegisterReceiver();
     }
+
+    private void doRegisterReceiver() {
+        mReceiver=new ContentReceiver();
+        IntentFilter filter = new IntentFilter(
+                "com.example.musicplayer.service");
+        registerReceiver(mReceiver, filter);
+    }
+
+    public final class MyServiceConn implements ServiceConnection {
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder iBinder) {
+            service = (MusicService.MusicControl) iBinder;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    }
+
+    public class ContentReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int currentDuration = intent.getExtras().getInt("currentDuration");
+            int duration = intent.getExtras().getInt("duration");
+            System.out.println("currentDuration is ======="+ currentDuration);
+
+            sb.setMax(duration); //设置总长度
+            sb.setProgress(currentDuration); //设置当前进度值
+
+            int min = duration / 1000 / 60;
+            int sec = duration / 1000 % 60;
+
+            String strMin = "";
+            String strSec = "";
+            if(min<10){
+                strMin = "0"+min;
+            }else {
+                strMin = min+"";
+            }
+
+            if(sec<10){
+                strSec = "0"+sec;
+            }else {
+                strSec = sec+"";
+            }
+
+            //设置进度条
+            songDuration.setText(strMin + ":" + strSec);
+
+            min = currentDuration / 1000 / 60;
+            sec = currentDuration / 1000 % 60;
+
+            if(min<10){
+                strMin = "0"+min;
+            }else {
+                strMin = min+"";
+            }
+
+            if(sec<10){
+                strSec = "0"+sec;
+            }else {
+                strSec = sec+"";
+            }
+
+            songCurrentDuration.setText(strMin + ":" + strSec);
+        }
+    }
+
+    public static Handler handler = new Handler(){
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+//            super.handleMessage(msg);
+            Bundle bundle = msg.getData();
+
+            int duration = bundle.getInt("duration");
+            int currentDuration = bundle.getInt("currentDuration");
+            System.out.println(duration);
+//
+            sb.setMax(duration); //设置总长度
+            sb.setProgress(currentDuration); //设置当前进度值
+
+            int min = duration / 1000 / 60;
+            int sec = duration / 1000 % 60;
+
+            String strMin = "";
+            String strSec = "";
+            if(min<10){
+                strMin = "0"+min;
+            }else {
+                strMin = min+"";
+            }
+
+            if(sec<10){
+                strSec = "0"+sec;
+            }else {
+                strSec = sec+"";
+            }
+
+            //设置进度条
+            songDuration.setText(strMin + ":" + strSec);
+
+            min = currentDuration / 1000 / 60;
+            sec = currentDuration / 1000 % 60;
+
+            if(min<10){
+                strMin = "0"+min;
+            }else {
+                strMin = min+"";
+            }
+
+            if(sec<10){
+                strSec = "0"+sec;
+            }else {
+                strSec = sec+"";
+            }
+
+            songCurrentDuration.setText(strMin + ":" + strSec);
+        }
+    };
 }
