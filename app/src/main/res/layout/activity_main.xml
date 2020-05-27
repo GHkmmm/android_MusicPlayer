@@ -74,7 +74,7 @@
             android:id="@+id/goListViewBtn"
             android:layout_width="60dp"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/music_img" />
+            app:srcCompat="@drawable/default_cover" />
 
         <LinearLayout
             android:layout_width="190dp"
@@ -88,7 +88,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1.2"
-                android:text="白色风车"
+                android:text="暂无音乐"
                 android:textSize="18dp"
                 android:gravity="bottom"/>
 
@@ -97,7 +97,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:text="白色的风车的风车 安静的转着"
+                android:text=""
                 android:paddingTop="5dp"/>
 
         </LinearLayout>

@@ -26,7 +26,6 @@ import java.util.TimerTask;
  */
 public class MusicService extends Service {
     private MediaPlayer player;
-//    File file = new File(Environment.getExternalStorageDirectory() + "/Download/", "周杰伦+-+黑色幽默.mp3");
     private Timer timer;
 
     public MusicService() {
@@ -46,16 +45,7 @@ public class MusicService extends Service {
                 @Override
                 public void run() {
                     if(player == null) return;
-                    int duration = player.getDuration();
-                    int currentDuration = player.getCurrentPosition();
-//                    Message msg = LocalMusicFragment.handler.obtainMessage();
-//                    Bundle bundle = new Bundle();
-//                    bundle.putInt("duration", duration);
-//                    bundle.putInt("currentDuration", currentDuration);
-//                    msg.setData(bundle);
-//
-//                    LocalMusicFragment.handler.sendMessage(msg);
-                    sendContentBroadcast(duration, currentDuration);
+                    sendContentBroadcast();
                 }
             };
             timer.schedule(task, 5, 500);
@@ -79,41 +69,38 @@ public class MusicService extends Service {
     }
 
     public class MusicControl extends Binder{
-
+        //播放音乐
         public void play(String path) {
-            System.out.println(path);
             try {
                 player.reset();
-//                player = MediaPlayer.create(getApplicationContext(), R.raw.test);
                 player.setDataSource(path);
                 player.prepare();
-
                 addTimer();
                 player.start();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
+        //暂停音乐
         public void pausePlay(){
             player.pause();
         }
-
+        //继续播放音乐
         public void continuePlay(){
             player.start();
         }
-
+        //进度跳转
         public void seekTo(int progress){
             player.seekTo(progress); //设置音乐播放位置
         }
     }
 
-    protected void sendContentBroadcast(int duration, int currentDuration){
+    protected void sendContentBroadcast(){
         Intent intent = new Intent();
         intent.setAction("com.example.musicplayer.service");
         Bundle bundle = new Bundle();
-        bundle.putInt("duration", duration);
-        bundle.putInt("currentDuration", currentDuration);
+        bundle.putInt("duration", player.getDuration());
+        bundle.putInt("currentDuration", player.getCurrentPosition());
         bundle.putBoolean("isPlaying", player.isPlaying());
         intent.putExtras(bundle);
         sendBroadcast(intent);

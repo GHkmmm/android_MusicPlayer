@@ -126,7 +126,6 @@ public class ListsActivity extends AppCompatActivity {
                                 bundle.putSerializable("song", (Serializable) song);
                                 backIntent.putExtras(bundle);
                                 ListsActivity.this.setResult(RESULT_OK, backIntent);
-                                ListsActivity.this.finish();
                             }else {
                                 Log.i("HttpURLConnection.GET", "请求失败");
                             }
@@ -154,6 +153,7 @@ public class ListsActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        ListsActivity.this.finish();
         super.onDestroy();
         unbindService(myServiceConn); //解绑服务
         stopService(intent); //停止服务

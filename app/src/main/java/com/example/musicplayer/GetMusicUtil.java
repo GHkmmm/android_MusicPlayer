@@ -9,13 +9,18 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.Size;
 import android.widget.ImageView;
 
 import com.example.musicplayer.bean.Song;
 
 import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class GetMusicUtil {
@@ -28,7 +33,6 @@ public class GetMusicUtil {
     public ArrayList<Song> getMusic(){
         ArrayList<Song> mList = new ArrayList<>();
         Cursor cursor = resolver.query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, null, null, null, null);
-        System.out.println(cursor.getCount());
         if(cursor.moveToNext()){
             for(int i = 0; i<cursor.getCount(); i++){
                 Song song = new Song();
@@ -41,12 +45,7 @@ public class GetMusicUtil {
                 long size = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
                 int album_id = cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
 
-
-                String cover = getAlbumArt(album_id);
-                Bitmap bm = BitmapFactory.decodeFile(cover);
-
-
-//                Bitmap bm = setArtwork(getMediaStoreAlbumCoverUri(album_id));
+                Bitmap bm = getArtAlbum(id);
 
                 song.setId(id);
                 song.setName(name);
@@ -56,9 +55,6 @@ public class GetMusicUtil {
                 song.setDuration(duration);
                 song.setSize(size);
                 song.setAlbum_img(bm);
-
-                System.out.println(name+"-----"+album);
-                System.out.println("path is ======"+url);
 
                 mList.add(song);
 
@@ -70,21 +66,22 @@ public class GetMusicUtil {
         return mList;
     }
 
-    private String getAlbumArt(int album_id) {
-        String mUriAlbums = "content://media/external/audio/albums";
-        String[] projection = new String[] { "album_art" };
-        System.out.println("id========"+album_id);
-        Cursor cur = resolver.query( Uri.parse(mUriAlbums + "/" + Integer.toString(album_id)), projection, null, null, null);
-        System.out.println("cur-----------"+cur);
-        String album_art = null;
-        if (cur.getCount() > 0 && cur.getColumnCount() > 0){
-            cur.moveToNext();
-            album_art = cur.getString(0);
+    public Bitmap getArtAlbum(long audioId) {
+        String str = "content://media/external/audio/media/" + audioId + "/albumart";
+        Uri uri = Uri.parse(str);
+        ParcelFileDescriptor pfd = null;
+        try {
+            pfd = resolver.openFileDescriptor(uri, "r");
+        } catch (FileNotFoundException e) {
+            return null;
         }
-        cur.close();
-        cur = null;
-        System.out.println("album --------" + album_art);
-        return album_art;
+        Bitmap bm;
+        if (pfd != null) {
+            FileDescriptor fd = pfd.getFileDescriptor();
+            bm = BitmapFactory.decodeFileDescriptor(fd);
+            return bm;
+        }
+        return null;
     }
 
 }

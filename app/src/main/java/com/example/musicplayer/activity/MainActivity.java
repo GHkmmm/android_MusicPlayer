@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putString("name", songName.getText().toString());
                 bundle.putString("lyrics", songLyrics.getText().toString());
+                bundle.putString("cover", String.valueOf(goPlayListView.getDrawable()));
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
