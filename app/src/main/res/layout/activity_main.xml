@@ -74,7 +74,7 @@
             android:id="@+id/goListViewBtn"
             android:layout_width="60dp"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/default_cover" />
+            app:srcCompat="@drawable/play_page_default_cover" />
 
         <LinearLayout
             android:layout_width="190dp"

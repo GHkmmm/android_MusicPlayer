@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -23,6 +25,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.example.musicplayer.R;
 import com.example.musicplayer.adapter.ViewPagerAdapter;
+import com.example.musicplayer.bean.Album;
 import com.example.musicplayer.fragment.AlbumFragment;
 import com.example.musicplayer.fragment.LyricsFragment;
 import com.example.musicplayer.service.MusicService;
@@ -39,7 +42,8 @@ public class PlayActivity extends AppCompatActivity {
     private TextView name, lyrics, circle1, circle2;
     private static TextView songCurrentDuration, songDuration;
     private static SeekBar sb;
-    private ImageView playOrPauseBtn;
+    private ImageView playOrPauseBtn, playCover;
+    Bitmap img;
     private MusicService.MusicControl service;
     private ServiceConnection conn;
     private ContentReceiver mReceiver;
@@ -53,7 +57,7 @@ public class PlayActivity extends AppCompatActivity {
         setContentView(R.layout.play);
         initView();
 
-        albumFragment = new AlbumFragment();
+        albumFragment = new AlbumFragment(img);
         lyricsFragment = new LyricsFragment();
 
         fragmentList = new ArrayList<>();
@@ -92,12 +96,12 @@ public class PlayActivity extends AppCompatActivity {
             }
         });
 
+//        playCover = (getSupportFragmentManager().findFragmentByTag("android:switcher"+R.id.viewPager+"0")).getView().findViewById(R.id.play_cover);
 
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
+//        System.out.println("playCover is ======"+ getSupportFragmentManager().findFragmentByTag("android:switcher"+R.id.viewPager+"0"));
 
-        name.setText(bundle.getString("name"));
-        lyrics.setText(bundle.getString("lyrics"));
+
+//        playCover.setImageBitmap(img);
 
         doRegisterReceiver();
 
@@ -143,11 +147,20 @@ public class PlayActivity extends AppCompatActivity {
         playOrPauseBtn = findViewById(R.id.play_play_or_pause);
         songCurrentDuration = findViewById(R.id.current_duration);
         songDuration = findViewById(R.id.duration);
+
         serviceIntent = new Intent(PlayActivity.this, MusicService.class);
         conn = new MyServiceConn();
         bindService(new Intent(PlayActivity.this, MusicService.class), conn, BIND_AUTO_CREATE);
 
-        System.out.println("sb is ======="+sb);
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        byte buff[] = intent.getByteArrayExtra("img");
+        img = BitmapFactory.decodeByteArray(buff, 0, buff.length);
+
+        name.setText(bundle.getString("name"));
+        lyrics.setText(bundle.getString("lyrics"));
+
+        System.out.println("img is ======="+img);
     }
 
     private void doRegisterReceiver() {

@@ -10,6 +10,8 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,6 +24,7 @@ import com.example.musicplayer.bean.Song;
 import com.example.musicplayer.fragment.LocalMusicFragment;
 import com.example.musicplayer.fragment.OnlineMusicFragment;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,6 +120,10 @@ public class MainActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putString("name", songName.getText().toString());
                 bundle.putString("lyrics", songLyrics.getText().toString());
+                Bitmap bitmap = ((BitmapDrawable)goPlayView.getDrawable()).getBitmap();
+                Bitmap img = Bitmap.createBitmap(bitmap);
+                byte bytes[] = Bitmap2Bytes(img);
+                intent.putExtra("img", bytes);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
@@ -145,8 +152,9 @@ public class MainActivity extends AppCompatActivity {
         songLyrics = findViewById(R.id.song_lyrics);
     }
 
-    public void getSong(){
-//        Intent getSongIntent = new Intent();
-
+    private byte[] Bitmap2Bytes(Bitmap bm){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return baos.toByteArray();
     }
 }
